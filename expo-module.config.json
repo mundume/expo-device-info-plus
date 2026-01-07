@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoDeviceInfoPlusModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.deviceinfoplus.ExpoDeviceInfoPlusModule"]
+  }
+}
