@@ -1,50 +1,72 @@
 package expo.modules.deviceinfoplus
 
+import android.os.Build
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
 
 class ExpoDeviceInfoPlusModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoDeviceInfoPlus')` in JavaScript.
     Name("ExpoDeviceInfoPlus")
 
-    // Defines constant property on the module.
-    Constant("PI") {
-      Math.PI
-    }
+    // Device constants - available synchronously
+    Constants(
+            "brand" to Build.BRAND,
+            "manufacturer" to Build.MANUFACTURER,
+            "model" to Build.MODEL,
+            "deviceName" to Build.DEVICE,
+            "product" to Build.PRODUCT,
+            "osName" to "Android",
+            "osVersion" to Build.VERSION.RELEASE,
+            "sdkVersion" to Build.VERSION.SDK_INT,
+            "hardware" to Build.HARDWARE,
+            "fingerprint" to Build.FINGERPRINT,
+            "isEmulator" to isEmulator()
+    )
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    // Synchronous functions
+    Function("getBrand") { Build.BRAND }
+    Function("getManufacturer") { Build.MANUFACTURER }
+    Function("getModel") { Build.MODEL }
+    Function("getDeviceName") { Build.DEVICE }
+    Function("getProduct") { Build.PRODUCT }
+    Function("getOsVersion") { Build.VERSION.RELEASE }
+    Function("getSdkVersion") { Build.VERSION.SDK_INT }
+    Function("getHardware") { Build.HARDWARE }
+    Function("isEmulator") { isEmulator() }
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+    // Async function to get all device info at once
+    AsyncFunction("getDeviceInfo") {
+      mapOf(
+              "brand" to Build.BRAND,
+              "manufacturer" to Build.MANUFACTURER,
+              "model" to Build.MODEL,
+              "deviceName" to Build.DEVICE,
+              "product" to Build.PRODUCT,
+              "osName" to "Android",
+              "osVersion" to Build.VERSION.RELEASE,
+              "sdkVersion" to Build.VERSION.SDK_INT,
+              "hardware" to Build.HARDWARE,
+              "fingerprint" to Build.FINGERPRINT,
+              "isEmulator" to isEmulator(),
+              "boardName" to Build.BOARD,
+              "bootloader" to Build.BOOTLOADER,
+              "display" to Build.DISPLAY,
+              "host" to Build.HOST,
+              "buildId" to Build.ID,
+              "type" to Build.TYPE,
+              "buildTags" to Build.TAGS
+      )
     }
+  }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
-    }
-
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoDeviceInfoPlusView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: ExpoDeviceInfoPlusView, url: URL ->
-        view.webView.loadUrl(url.toString())
-      }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
-    }
+  private fun isEmulator(): Boolean {
+    return (Build.FINGERPRINT.startsWith("generic") ||
+            Build.FINGERPRINT.startsWith("unknown") ||
+            Build.MODEL.contains("google_sdk") ||
+            Build.MODEL.contains("Emulator") ||
+            Build.MODEL.contains("Android SDK built for x86") ||
+            Build.MANUFACTURER.contains("Genymotion") ||
+            Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic") ||
+            Build.PRODUCT == "google_sdk")
   }
 }
