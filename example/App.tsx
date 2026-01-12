@@ -15,10 +15,28 @@ export default function App() {
     const info = await ExpoDeviceInfoPlus.getBatteryLevel();
     setBatteryInfo(info);
   };
+  useEffect(() => {
+  const subscription = ExpoDeviceInfoPlus.addListener(
+    "onBatteryLevelChanged",
+    (event: { level: number }) => {
+      console.log(event.level);
+      setBatteryInfo(event.level);
+    }
+  );
+
+  ExpoDeviceInfoPlus.startBatteryListener();
+
+  return () => {
+    subscription.remove();
+    ExpoDeviceInfoPlus.stopBatteryListener();
+  };
+}, []);
+
+
 
   useEffect(() => {
     fetchDeviceInfo();
-    fetchBatteryInfo();
+   
   }, []);
 
   return (
