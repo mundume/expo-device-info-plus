@@ -8,9 +8,11 @@ export type DeviceInfo = {
 }
 
 
+
 declare class ExpoDeviceInfoPlusModule extends NativeModule<{}> {
  
   getDeviceInfo(): Promise<DeviceInfo>;
+  getBatteryLevel(): Promise<number>;
 }
 
 // This call loads the native module object from the JSI.

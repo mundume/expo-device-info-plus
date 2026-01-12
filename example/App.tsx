@@ -4,14 +4,21 @@ import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from 'react-
 
 export default function App() {
   const [fullDeviceInfo, setFullDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [batteryInfo, setBatteryInfo] = useState<number | null>(null);
 
   const fetchDeviceInfo = async () => {
     const info = await ExpoDeviceInfoPlus.getDeviceInfo();
     setFullDeviceInfo(info);
   };
 
+  const fetchBatteryInfo = async () => {
+    const info = await ExpoDeviceInfoPlus.getBatteryLevel();
+    setBatteryInfo(info);
+  };
+
   useEffect(() => {
     fetchDeviceInfo();
+    fetchBatteryInfo();
   }, []);
 
   return (
@@ -26,6 +33,9 @@ export default function App() {
           <InfoRow label="OS Version" value={fullDeviceInfo?.version} />
         </Group>
 
+        <Group name="Battery Info">
+          <InfoRow label="Battery Level" value={batteryInfo?.toString() || 'N/A'} />
+        </Group>
      
       </ScrollView>
     </SafeAreaView>
