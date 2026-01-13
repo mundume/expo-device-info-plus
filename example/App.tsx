@@ -5,6 +5,9 @@ import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from 'react-
 export default function App() {
   const [fullDeviceInfo, setFullDeviceInfo] = useState<DeviceInfo | null>(null);
   const [batteryInfo, setBatteryInfo] = useState<number | null>(null);
+  const [batteryTemperature, setBatteryTemperature] = useState<number | null>(null);
+  const [batteryStatus, setBatteryStatus] = useState<boolean | null>(null);
+  const [batteryVoltage, setBatteryVoltage] = useState<number | null>(null);
 
   const fetchDeviceInfo = async () => {
     const info = await ExpoDeviceInfoPlus.getDeviceInfo();
@@ -15,6 +18,27 @@ export default function App() {
     const info = await ExpoDeviceInfoPlus.getBatteryLevel();
     setBatteryInfo(info);
   };
+
+  const fetchBatteryTemperature = async () => {
+    const info = await ExpoDeviceInfoPlus.getBatteryTemperature();
+    setBatteryTemperature(info);
+  };
+
+  useEffect(()=>{
+    const sub = ExpoDeviceInfoPlus.addListener(
+      "onBatteryStatusChanged",
+      (event: { isCharging: boolean }) => {
+        console.log(event.isCharging);
+        setBatteryStatus(event.isCharging);
+      }
+    );
+
+    return () => {
+      sub.remove();
+    }
+
+  },[])
+
   useEffect(() => {
   const subscription = ExpoDeviceInfoPlus.addListener(
     "onBatteryLevelChanged",
@@ -23,6 +47,7 @@ export default function App() {
       setBatteryInfo(event.level);
     }
   );
+
 
   ExpoDeviceInfoPlus.startBatteryListener();
 
@@ -37,6 +62,7 @@ export default function App() {
   useEffect(() => {
     fetchDeviceInfo();
    
+    fetchBatteryTemperature();
   }, []);
 
   return (
@@ -53,6 +79,14 @@ export default function App() {
 
         <Group name="Battery Info">
           <InfoRow label="Battery Level" value={batteryInfo?.toString() || 'N/A'} />
+          <InfoRow label="Battery Temperature" value={batteryTemperature?.toString() || 'N/A'} />
+        </Group>
+        <Group name='Charging Event'>
+        <InfoRow label="Battery Status" value={JSON.stringify(batteryStatus)} />
+        
+
+          
+
         </Group>
      
       </ScrollView>

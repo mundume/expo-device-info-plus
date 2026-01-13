@@ -16,7 +16,7 @@ class ExpoDeviceInfoPlusModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ExpoDeviceInfoPlus")
 
-    Events("onBatteryLevelChanged")
+    Events("onBatteryStatusChanged", "onBatteryLevelChanged")
 
     AsyncFunction("getDeviceInfo") {
       mapOf(
@@ -41,21 +41,46 @@ class ExpoDeviceInfoPlusModule : Module() {
       batteryReceiver =
               object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context?, intent: Intent?) {
-                  val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: return
+                  // Extract BOTH values from the SAME intent
+                  val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+                  val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+
+                  // Send BOTH events
                   sendEvent("onBatteryLevelChanged", mapOf("level" to level))
+                  sendEvent(
+                          "onBatteryStatusChanged",
+                          mapOf("isCharging" to (status == BatteryManager.BATTERY_STATUS_CHARGING))
+                  )
                 }
               }
 
       context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-
       return@AsyncFunction null
     }
+
+    // Remove getBatteryChargingInfo entirely - not needed
 
     AsyncFunction("stopBatteryListener") {
       val context = appContext.reactContext ?: return@AsyncFunction null
       batteryReceiver?.let { context.unregisterReceiver(it) }
       batteryReceiver = null
       return@AsyncFunction null
+    }
+
+    AsyncFunction("getBatteryTemperature") {
+      val context = appContext.reactContext ?: return@AsyncFunction null
+
+      val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+      // Temperature comes in tenths of a degree Celsius
+      val tempTenths = intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
+
+      // Convert to regular Celsius
+      tempTenths / 10.0
+    }
+    AsyncFunction("getBatteryVoltage") {
+      val context = appContext.reactContext ?: return@AsyncFunction null
+      val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+      intent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) ?: 0
     }
 
     OnDestroy {
