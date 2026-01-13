@@ -21,8 +21,6 @@ declare class ExpoDeviceInfoPlusModule extends NativeModule<{
 }> {
   getDeviceInfo(): Promise<DeviceInfo>;
   getBatteryLevel(): Promise<number>;
-  startBatteryListener(): Promise<void>;
-  stopBatteryListener(): Promise<void>;
   getBatteryTemperature(): Promise<number>;
   getBatteryVoltage(): Promise<number>;
 }

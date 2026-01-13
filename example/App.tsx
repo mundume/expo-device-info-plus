@@ -1,67 +1,49 @@
 import { useState, useEffect } from 'react';
-import ExpoDeviceInfoPlus, { DeviceInfo} from 'expo-device-info-plus';
-import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from 'react-native';
+import ExpoDeviceInfoPlus, { DeviceInfo } from 'expo-device-info-plus';
+import { SafeAreaView, ScrollView, Text, StyleSheet, View } from 'react-native';
 
 export default function App() {
   const [fullDeviceInfo, setFullDeviceInfo] = useState<DeviceInfo | null>(null);
   const [batteryInfo, setBatteryInfo] = useState<number | null>(null);
   const [batteryTemperature, setBatteryTemperature] = useState<number | null>(null);
   const [batteryStatus, setBatteryStatus] = useState<boolean | null>(null);
-  const [batteryVoltage, setBatteryVoltage] = useState<number | null>(null);
 
   const fetchDeviceInfo = async () => {
     const info = await ExpoDeviceInfoPlus.getDeviceInfo();
     setFullDeviceInfo(info);
   };
 
-  const fetchBatteryInfo = async () => {
-    const info = await ExpoDeviceInfoPlus.getBatteryLevel();
-    setBatteryInfo(info);
-  };
-
   const fetchBatteryTemperature = async () => {
-    const info = await ExpoDeviceInfoPlus.getBatteryTemperature();
-    setBatteryTemperature(info);
+    const temp = await ExpoDeviceInfoPlus.getBatteryTemperature();
+    setBatteryTemperature(temp);
   };
 
-  useEffect(()=>{
-    const sub = ExpoDeviceInfoPlus.addListener(
+
+  useEffect(() => {
+    const subscription = ExpoDeviceInfoPlus.addListener(
+      "onBatteryLevelChanged",
+      (event: { level: number }) => {
+        setBatteryInfo(event.level);
+      }
+    );
+
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    const subscription = ExpoDeviceInfoPlus.addListener(
       "onBatteryStatusChanged",
       (event: { isCharging: boolean }) => {
-        console.log(event.isCharging);
         setBatteryStatus(event.isCharging);
       }
     );
 
-    return () => {
-      sub.remove();
-    }
+    return () => subscription.remove();
+  }, []);
 
-  },[])
-
-  useEffect(() => {
-  const subscription = ExpoDeviceInfoPlus.addListener(
-    "onBatteryLevelChanged",
-    (event: { level: number }) => {
-      console.log(event.level);
-      setBatteryInfo(event.level);
-    }
-  );
-
-
-  ExpoDeviceInfoPlus.startBatteryListener();
-
-  return () => {
-    subscription.remove();
-    ExpoDeviceInfoPlus.stopBatteryListener();
-  };
-}, []);
-
-
-
+ 
   useEffect(() => {
     fetchDeviceInfo();
-   
     fetchBatteryTemperature();
   }, []);
 
@@ -69,7 +51,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>📱 Device Info Plus</Text>
-        
+
         <Group name="Quick Info (Constants)">
           <InfoRow label="Brand" value={fullDeviceInfo?.brand} />
           <InfoRow label="Model" value={fullDeviceInfo?.model} />
@@ -81,14 +63,10 @@ export default function App() {
           <InfoRow label="Battery Level" value={batteryInfo?.toString() || 'N/A'} />
           <InfoRow label="Battery Temperature" value={batteryTemperature?.toString() || 'N/A'} />
         </Group>
-        <Group name='Charging Event'>
-        <InfoRow label="Battery Status" value={JSON.stringify(batteryStatus)} />
-        
 
-          
-
+        <Group name="Charging Event">
+          <InfoRow label="Battery Status" value={JSON.stringify(batteryStatus)} />
         </Group>
-     
       </ScrollView>
     </SafeAreaView>
   );

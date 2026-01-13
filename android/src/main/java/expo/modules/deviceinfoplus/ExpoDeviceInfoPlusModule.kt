@@ -33,19 +33,14 @@ class ExpoDeviceInfoPlusModule : Module() {
       bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
-    AsyncFunction("startBatteryListener") {
-      val context = appContext.reactContext ?: return@AsyncFunction null
-
-      if (batteryReceiver != null) return@AsyncFunction null
-
+    OnStartObserving {
+      val context = appContext.reactContext ?: return@OnStartObserving
       batteryReceiver =
               object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context?, intent: Intent?) {
-                  // Extract BOTH values from the SAME intent
                   val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                   val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
 
-                  // Send BOTH events
                   sendEvent("onBatteryLevelChanged", mapOf("level" to level))
                   sendEvent(
                           "onBatteryStatusChanged",
@@ -53,19 +48,15 @@ class ExpoDeviceInfoPlusModule : Module() {
                   )
                 }
               }
-
       context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-      return@AsyncFunction null
     }
 
-    // Remove getBatteryChargingInfo entirely - not needed
-
-    AsyncFunction("stopBatteryListener") {
-      val context = appContext.reactContext ?: return@AsyncFunction null
+    OnStopObserving {
+      val context = appContext.reactContext ?: return@OnStopObserving
       batteryReceiver?.let { context.unregisterReceiver(it) }
       batteryReceiver = null
-      return@AsyncFunction null
     }
+
 
     AsyncFunction("getBatteryTemperature") {
       val context = appContext.reactContext ?: return@AsyncFunction null
