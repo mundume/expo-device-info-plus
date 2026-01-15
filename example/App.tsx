@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ExpoDeviceInfoPlus, { DeviceInfo } from 'expo-device-info-plus';
 import { SafeAreaView, ScrollView, Text, StyleSheet, View } from 'react-native';
+import ExpressiveWavyProgress from '../src/ExpoDeviceInfoPlusView';
 
 export default function App() {
   const [fullDeviceInfo, setFullDeviceInfo] = useState<DeviceInfo | null>(null);
@@ -51,12 +52,13 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>📱 Device Info Plus</Text>
+        <ExpressiveWavyProgress progress={0.5} style={{width: 100, height: 10}}/>
 
         <Group name="Quick Info (Constants)">
-          <InfoRow label="Brand" value={fullDeviceInfo?.brand} />
-          <InfoRow label="Model" value={fullDeviceInfo?.model} />
-          <InfoRow label="Manufacturer" value={fullDeviceInfo?.name} />
-          <InfoRow label="OS Version" value={fullDeviceInfo?.version} />
+          <InfoRow label="Brand" value={fullDeviceInfo?.brand ?? 'N/A'} />
+          <InfoRow label="Model" value={fullDeviceInfo?.model ?? 'N/A'} />
+          <InfoRow label="Manufacturer" value={fullDeviceInfo?.name ?? 'N/A'} />
+          <InfoRow label="OS Version" value={fullDeviceInfo?.version ?? 'N/A'} />
         </Group>
 
         <Group name="Battery Info">

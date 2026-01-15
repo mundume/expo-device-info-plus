@@ -18,6 +18,11 @@ class ExpoDeviceInfoPlusModule : Module() {
 
     Events("onBatteryStatusChanged", "onBatteryLevelChanged")
 
+    // Register the native view
+    View(ExpressiveWavyView::class) {
+      Prop("progress") { view: ExpressiveWavyView, progress: Float -> view.setProgress(progress) }
+    }
+
     AsyncFunction("getDeviceInfo") {
       mapOf(
               "name" to Build.MANUFACTURER,
@@ -57,7 +62,6 @@ class ExpoDeviceInfoPlusModule : Module() {
       batteryReceiver = null
     }
 
-
     AsyncFunction("getBatteryTemperature") {
       val context = appContext.reactContext ?: return@AsyncFunction null
 
@@ -68,6 +72,7 @@ class ExpoDeviceInfoPlusModule : Module() {
       // Convert to regular Celsius
       tempTenths / 10.0
     }
+
     AsyncFunction("getBatteryVoltage") {
       val context = appContext.reactContext ?: return@AsyncFunction null
       val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))

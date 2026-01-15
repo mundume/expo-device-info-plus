@@ -27,6 +27,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+      "expo-build-properties",
+      {
+        "android": {
+          "kotlinVersion": "2.1.20"
+        }
+      }
+      ]
+    ]
   }
 }

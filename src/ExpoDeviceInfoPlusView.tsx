@@ -1,11 +1,14 @@
-import { requireNativeView } from 'expo';
+import { requireNativeViewManager } from 'expo-modules-core';
 import * as React from 'react';
 
-import { ExpoDeviceInfoPlusViewProps } from './ExpoDeviceInfoPlus.types';
+type ExpressiveWavyProgressProps = {
+  progress: number;  // 0.0 to 1.0
+  style?: any;
+};
 
-const NativeView: React.ComponentType<ExpoDeviceInfoPlusViewProps> =
-  requireNativeView('ExpoDeviceInfoPlus');
+// Use the correct exported name
+const NativeView = requireNativeViewManager('ExpoDeviceInfoPlus_ExpressiveWavyView');
 
-export default function ExpoDeviceInfoPlusView(props: ExpoDeviceInfoPlusViewProps) {
+export default function ExpressiveWavyProgress(props: ExpressiveWavyProgressProps) {
   return <NativeView {...props} />;
 }
