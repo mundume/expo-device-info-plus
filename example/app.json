@@ -23,7 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "expo.modules.deviceinfoplus.example"
+      "package": "com.expodeviceinfoplusexample"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -62,6 +62,17 @@ dependencies {
   implementation 'androidx.compose.foundation:foundation'
   implementation 'androidx.activity:activity-compose:1.9.3'
 
+  // Glance dependencies
+  implementation 'androidx.glance:glance-appwidget:1.1.1'
+  implementation 'androidx.glance:glance-material3:1.1.1'
+
+  // DataStore (required for Glance state management)
+  implementation 'androidx.datastore:datastore-preferences:1.1.1'
+
+  // Coroutines
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+
   // Debug dependencies
   debugImplementation 'androidx.compose.ui:ui-tooling'
 }
